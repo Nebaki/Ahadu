@@ -6,6 +6,7 @@ import 'package:ahadu/constants.dart';
 import 'package:ahadu/model/jobs.dart';
 import 'package:ahadu/screen/jobDetail.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -14,8 +15,8 @@ import 'package:vocsy_esys_flutter_share/vocsy_esys_flutter_share.dart';
 import 'package:ahadu/noInternet.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/retry.dart';
-
-import '../component/appScaffold.dart';
+import 'bottomAd.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 
 enum _menuItem { open, favorite, share }
 
@@ -101,341 +102,723 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
           centerTitle: true,
           backgroundColor: PrimaryColor,
         ),
-        body: AppScaffold(
-          child: RefreshIndicator(
-            onRefresh: _pullRefresh,
-            child: FutureBuilder<List<Jobs>>(
-              future: _future,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  List<Jobs> active = snapshot.data as List<Jobs>;
-                  return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const ClampingScrollPhysics(),
-                      controller: scrollController,
-                      itemCount: posts.length + (hasMore ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index == posts.length) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        return InkWell(
-                          onTap: () {
-                            Get.to(() => JobDetail(), arguments: [
-                              {
-                                'id': active[index].id.toString(),
-                                "name": active[index].companyName.toString(),
-                                "Description":
-                                    active[index].jobDescription.toString(),
-                                "logo": active[index].companyLogo.toString(),
-                                "location": active[index].location.toString(),
-                                "type": active[index].workType.toString(),
-                                "deadline":
-                                    active[index].jobDeadline.toString(),
-                                "jobTitle": active[index].jobTitle.toString(),
-                                "level": active[index].level.toString(),
-                                "salary": active[index].salary.toString(),
-                              }
-                            ]);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                            child: Card(
-                              elevation: 4,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
+        body: OfflineBuilder(
+            debounceDuration: Duration.zero,
+            connectivityBuilder: (
+              BuildContext context,
+              ConnectivityResult connectivity,
+              Widget child,
+            ) {
+              if (connectivity == ConnectivityResult.none) {
+                return Center(
+                    child: Text('Please check your internet connection!'));
+              }
+              return child;
+            },
+            child: RefreshIndicator(
+              onRefresh: _pullRefresh,
+              child: FutureBuilder<List<Jobs>>(
+                future: _future,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    List<Jobs> active = snapshot.data as List<Jobs>;
+                    return SingleChildScrollView(
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: const ClampingScrollPhysics(),
+                          controller: scrollController,
+                          itemCount: posts.length + (hasMore ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index == posts.length) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+
+                            if (index > 0 && index % 5 == 0) {
+                              return Column(
+                                children: [
+                                  BottomBannerAd(),
+                                  InkWell(
+                                    onTap: () {
+                                      Get.to(() => JobDetail(), arguments: [
+                                        {
+                                          'id': active[index].id.toString(),
+                                          "name": active[index]
+                                              .companyName
+                                              .toString(),
+                                          "Description": active[index]
+                                              .jobDescription
+                                              .toString(),
+                                          "logo": active[index]
+                                              .companyLogo
+                                              .toString(),
+                                          "location":
+                                              active[index].location.toString(),
+                                          "type":
+                                              active[index].workType.toString(),
+                                          "deadline": active[index]
+                                              .jobDeadline
+                                              .toString(),
+                                          "jobTitle":
+                                              active[index].jobTitle.toString(),
+                                          "level":
+                                              active[index].level.toString(),
+                                          "salary":
+                                              active[index].salary.toString(),
+                                        }
+                                      ]);
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 10, 10, 0),
+                                      child: Card(
+                                        elevation: 4,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        child: Container(
+                                          margin: const EdgeInsets.fromLTRB(
+                                              10, 5, 10, 5),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  CircleAvatar(
+                                                      radius: 20.0,
+                                                      child: CachedNetworkImage(
+                                                        imageUrl:
+                                                            "https://ahaduvacancy.com/Uploads/Images/" +
+                                                                active[index]
+                                                                    .companyLogo
+                                                                    .toString(),
+                                                        progressIndicatorBuilder: (context,
+                                                                url,
+                                                                downloadProgress) =>
+                                                            CircularProgressIndicator(
+                                                                value: downloadProgress
+                                                                    .progress),
+                                                        errorWidget: (context,
+                                                                url, error) =>
+                                                            Icon(Icons.error),
+                                                      )),
+                                                  Expanded(
+                                                    child: Container(
+                                                      margin: EdgeInsets.only(
+                                                          left: 15),
+                                                      child: Shimmer.fromColors(
+                                                        baseColor: Colors.red,
+                                                        highlightColor:
+                                                            Colors.yellow,
+                                                        child: Text(
+                                                            active[index]
+                                                                .jobTitle
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                                fontSize: 15,
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  PopupMenuButton<_menuItem>(
+                                                    onSelected: (value) {
+                                                      switch (value) {
+                                                        case _menuItem.open:
+                                                          Get.to(
+                                                              () => JobDetail(),
+                                                              arguments: [
+                                                                {
+                                                                  "salary": active[
+                                                                          index]
+                                                                      .salary
+                                                                      .toString(),
+                                                                  "name": active[
+                                                                          index]
+                                                                      .companyName
+                                                                      .toString(),
+                                                                  "Description": active[
+                                                                          index]
+                                                                      .jobDescription
+                                                                      .toString(),
+                                                                  "logo": active[
+                                                                          index]
+                                                                      .companyLogo
+                                                                      .toString(),
+                                                                  "location": active[
+                                                                          index]
+                                                                      .location
+                                                                      .toString(),
+                                                                  "id": active[
+                                                                          index]
+                                                                      .id
+                                                                      .toString(),
+                                                                  "type": active[
+                                                                          index]
+                                                                      .workType
+                                                                      .toString(),
+                                                                  "deadline": active[
+                                                                          index]
+                                                                      .jobDeadline
+                                                                      .toString(),
+                                                                  "jobTitle": active[
+                                                                          index]
+                                                                      .jobTitle
+                                                                      .toString(),
+                                                                  'level': active[
+                                                                          index]
+                                                                      .level
+                                                                      .toString(),
+                                                                }
+                                                              ]);
+                                                          break;
+                                                        case _menuItem.favorite:
+                                                          favoriteItem({
+                                                            "salary":
+                                                                active[index]
+                                                                    .salary
+                                                                    .toString(),
+                                                            "name":
+                                                                active[index]
+                                                                    .companyName
+                                                                    .toString(),
+                                                            "Description": active[
+                                                                    index]
+                                                                .jobDescription
+                                                                .toString(),
+                                                            "logo":
+                                                                active[index]
+                                                                    .companyLogo
+                                                                    .toString(),
+                                                            "location":
+                                                                active[index]
+                                                                    .location
+                                                                    .toString(),
+                                                            "id": active[index]
+                                                                .id
+                                                                .toString(),
+                                                            "type":
+                                                                active[index]
+                                                                    .workType
+                                                                    .toString(),
+                                                            "deadline":
+                                                                active[index]
+                                                                    .jobDeadline
+                                                                    .toString(),
+                                                            "jobTitle":
+                                                                active[index]
+                                                                    .jobTitle
+                                                                    .toString(),
+                                                            'level':
+                                                                active[index]
+                                                                    .level
+                                                                    .toString(),
+                                                          });
+                                                          break;
+                                                        case _menuItem.share:
+                                                          try {
+                                                            VocsyShare.text(
+                                                                'Ahadu vacancy',
+                                                                'https://ahaduvacancy.com/vacancy-detail.php?id=${active[index].id.toString()}',
+                                                                'text/plain');
+                                                          } catch (e) {
+                                                            print('error: $e');
+                                                          }
+                                                          break;
+                                                      }
+                                                    },
+                                                    itemBuilder: (context) => [
+                                                      PopupMenuItem(
+                                                        value: _menuItem.open,
+                                                        child: Text('Open',
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color:
+                                                                    PrimaryColor)),
+                                                      ),
+                                                      PopupMenuItem(
+                                                          value: _menuItem
+                                                              .favorite,
+                                                          child: Text(
+                                                              'Favorite',
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  color:
+                                                                      PrimaryColor))),
+                                                      PopupMenuItem(
+                                                          value:
+                                                              _menuItem.share,
+                                                          child: Text("Share",
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color:
+                                                                      PrimaryColor,
+                                                                  fontFamily:
+                                                                      'Poppins'))),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: Container(
+                                                      width: 200,
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              const Icon(Icons
+                                                                  .location_city),
+                                                              SizedBox(
+                                                                  width: 10),
+                                                              Expanded(
+                                                                child: Text(
+                                                                  active[index]
+                                                                      .companyName
+                                                                      .toString(),
+                                                                  softWrap:
+                                                                      true,
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'Poppins'),
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const Icon(Icons
+                                                                  .location_on_outlined),
+                                                              SizedBox(
+                                                                  width: 10),
+                                                              Expanded(
+                                                                child: Text(
+                                                                  active[index]
+                                                                      .location
+                                                                      .toString(),
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'Poppins'),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const Icon(Icons
+                                                                  .work_outline),
+                                                              SizedBox(
+                                                                  width: 10),
+                                                              Expanded(
+                                                                child: Text(
+                                                                  active[index]
+                                                                      .workType
+                                                                      .toString(),
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'Poppins'),
+                                                                  softWrap:
+                                                                      true,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      const Icon(
+                                                          Icons.lock_clock),
+                                                      Text(
+                                                        active[index]
+                                                            .jobDeadline
+                                                            .toString(),
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                'Poppins'),
+                                                      ),
+                                                    ],
+                                                  )
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                            return InkWell(
+                              onTap: () {
+                                Get.to(() => JobDetail(), arguments: [
+                                  {
+                                    'id': active[index].id.toString(),
+                                    "name":
+                                        active[index].companyName.toString(),
+                                    "Description":
+                                        active[index].jobDescription.toString(),
+                                    "logo":
+                                        active[index].companyLogo.toString(),
+                                    "location":
+                                        active[index].location.toString(),
+                                    "type": active[index].workType.toString(),
+                                    "deadline":
+                                        active[index].jobDeadline.toString(),
+                                    "jobTitle":
+                                        active[index].jobTitle.toString(),
+                                    "level": active[index].level.toString(),
+                                    "salary": active[index].salary.toString(),
+                                  }
+                                ]);
+                              },
                               child: Container(
-                                margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                                child: Card(
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  child: Container(
+                                    margin:
+                                        const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        CircleAvatar(
-                                            radius: 20.0,
-                                            child: CachedNetworkImage(
-                                              imageUrl:
-                                                  "https://ahaduvacancy.com/Uploads/Images/" +
-                                                      active[index]
-                                                          .companyLogo
-                                                          .toString(),
-                                              progressIndicatorBuilder:
-                                                  (context, url,
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            CircleAvatar(
+                                                radius: 20.0,
+                                                child: CachedNetworkImage(
+                                                  imageUrl:
+                                                      "https://ahaduvacancy.com/Uploads/Images/" +
+                                                          active[index]
+                                                              .companyLogo
+                                                              .toString(),
+                                                  progressIndicatorBuilder: (context,
+                                                          url,
                                                           downloadProgress) =>
                                                       CircularProgressIndicator(
                                                           value:
                                                               downloadProgress
                                                                   .progress),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      Icon(Icons.error),
-                                            )),
-                                        Expanded(
-                                          child: Container(
-                                            margin: EdgeInsets.only(left: 15),
-                                            child: Shimmer.fromColors(
-                                              baseColor: Colors.red,
-                                              highlightColor: Colors.yellow,
-                                              child: Text(
-                                                  active[index]
-                                                      .jobTitle
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontFamily: 'Poppins',
-                                                      fontWeight:
-                                                          FontWeight.bold)),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          Icon(Icons.error),
+                                                )),
+                                            Expanded(
+                                              child: Container(
+                                                margin:
+                                                    EdgeInsets.only(left: 15),
+                                                child: Shimmer.fromColors(
+                                                  baseColor: Colors.red,
+                                                  highlightColor: Colors.yellow,
+                                                  child: Text(
+                                                      active[index]
+                                                          .jobTitle
+                                                          .toString(),
+                                                      style: TextStyle(
+                                                          fontSize: 15,
+                                                          fontFamily: 'Poppins',
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                        PopupMenuButton<_menuItem>(
-                                          onSelected: (value) {
-                                            switch (value) {
-                                              case _menuItem.open:
-                                                Get.to(() => JobDetail(),
-                                                    arguments: [
-                                                      {
-                                                        "salary": active[index]
-                                                            .salary
-                                                            .toString(),
-                                                        "name": active[index]
-                                                            .companyName
-                                                            .toString(),
-                                                        "Description":
-                                                            active[index]
+                                            PopupMenuButton<_menuItem>(
+                                              onSelected: (value) {
+                                                switch (value) {
+                                                  case _menuItem.open:
+                                                    Get.to(() => JobDetail(),
+                                                        arguments: [
+                                                          {
+                                                            "salary":
+                                                                active[index]
+                                                                    .salary
+                                                                    .toString(),
+                                                            "name":
+                                                                active[index]
+                                                                    .companyName
+                                                                    .toString(),
+                                                            "Description": active[
+                                                                    index]
                                                                 .jobDescription
                                                                 .toString(),
-                                                        "logo": active[index]
-                                                            .companyLogo
-                                                            .toString(),
-                                                        "location":
+                                                            "logo":
+                                                                active[index]
+                                                                    .companyLogo
+                                                                    .toString(),
+                                                            "location":
+                                                                active[index]
+                                                                    .location
+                                                                    .toString(),
+                                                            "id": active[index]
+                                                                .id
+                                                                .toString(),
+                                                            "type":
+                                                                active[index]
+                                                                    .workType
+                                                                    .toString(),
+                                                            "deadline":
+                                                                active[index]
+                                                                    .jobDeadline
+                                                                    .toString(),
+                                                            "jobTitle":
+                                                                active[index]
+                                                                    .jobTitle
+                                                                    .toString(),
+                                                            'level':
+                                                                active[index]
+                                                                    .level
+                                                                    .toString(),
+                                                          }
+                                                        ]);
+                                                    break;
+                                                  case _menuItem.favorite:
+                                                    favoriteItem({
+                                                      "salary": active[index]
+                                                          .salary
+                                                          .toString(),
+                                                      "name": active[index]
+                                                          .companyName
+                                                          .toString(),
+                                                      "Description":
+                                                          active[index]
+                                                              .jobDescription
+                                                              .toString(),
+                                                      "logo": active[index]
+                                                          .companyLogo
+                                                          .toString(),
+                                                      "location": active[index]
+                                                          .location
+                                                          .toString(),
+                                                      "id": active[index]
+                                                          .id
+                                                          .toString(),
+                                                      "type": active[index]
+                                                          .workType
+                                                          .toString(),
+                                                      "deadline": active[index]
+                                                          .jobDeadline
+                                                          .toString(),
+                                                      "jobTitle": active[index]
+                                                          .jobTitle
+                                                          .toString(),
+                                                      'level': active[index]
+                                                          .level
+                                                          .toString(),
+                                                    });
+                                                    break;
+                                                  case _menuItem.share:
+                                                    try {
+                                                      VocsyShare.text(
+                                                          'Ahadu vacancy',
+                                                          'https://ahaduvacancy.com/vacancy-detail.php?id=${active[index].id.toString()}',
+                                                          'text/plain');
+                                                    } catch (e) {
+                                                      print('error: $e');
+                                                    }
+                                                    break;
+                                                }
+                                              },
+                                              itemBuilder: (context) => [
+                                                PopupMenuItem(
+                                                  value: _menuItem.open,
+                                                  child: Text('Open',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: PrimaryColor)),
+                                                ),
+                                                PopupMenuItem(
+                                                    value: _menuItem.favorite,
+                                                    child: Text('Favorite',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            color:
+                                                                PrimaryColor))),
+                                                PopupMenuItem(
+                                                    value: _menuItem.share,
+                                                    child: Text("Share",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: PrimaryColor,
+                                                            fontFamily:
+                                                                'Poppins'))),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                width: 200,
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        const Icon(Icons
+                                                            .location_city),
+                                                        SizedBox(width: 10),
+                                                        Expanded(
+                                                          child: Text(
+                                                            active[index]
+                                                                .companyName
+                                                                .toString(),
+                                                            softWrap: true,
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'Poppins'),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        const Icon(Icons
+                                                            .location_on_outlined),
+                                                        SizedBox(width: 10),
+                                                        Expanded(
+                                                          child: Text(
                                                             active[index]
                                                                 .location
                                                                 .toString(),
-                                                        "id": active[index]
-                                                            .id
-                                                            .toString(),
-                                                        "type": active[index]
-                                                            .workType
-                                                            .toString(),
-                                                        "deadline":
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'Poppins'),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        const Icon(
+                                                            Icons.work_outline),
+                                                        SizedBox(width: 10),
+                                                        Expanded(
+                                                          child: Text(
                                                             active[index]
-                                                                .jobDeadline
+                                                                .workType
                                                                 .toString(),
-                                                        "jobTitle":
-                                                            active[index]
-                                                                .jobTitle
-                                                                .toString(),
-                                                        'level': active[index]
-                                                            .level
-                                                            .toString(),
-                                                        'salary': active[index]
-                                                            .salary
-                                                            .toString()
-                                                      }
-                                                    ]);
-                                                break;
-                                              case _menuItem.favorite:
-                                                favoriteItem({
-                                                  'name': active[index]
-                                                      .companyName
-                                                      .toString(),
-                                                  "jobTitle": active[index]
-                                                      .jobTitle
-                                                      .toString(),
-                                                  "logo": active[index]
-                                                      .companyLogo
-                                                      .toString(),
-                                                  "location": active[index]
-                                                      .location
-                                                      .toString(),
-                                                  "type": active[index]
-                                                      .workType
-                                                      .toString(),
-                                                  "deadline": active[index]
-                                                      .jobDeadline
-                                                      .toString(),
-                                                  "Description": active[index]
-                                                      .jobDescription
-                                                      .toString(),
-                                                });
-                                                break;
-                                              case _menuItem.share:
-                                                try {
-                                                  VocsyShare.text(
-                                                      'Ahadu vacancy',
-                                                      'https://ahaduvacancy.com/vacancy-detail.php?id=${active[index].id.toString()}',
-                                                      'text/plain');
-                                                } catch (e) {
-                                                  print('error: $e');
-                                                }
-                                                break;
-                                            }
-                                          },
-                                          itemBuilder: (context) => [
-                                            PopupMenuItem(
-                                              value: _menuItem.open,
-                                              child: Text('Open',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: PrimaryColor)),
-                                            ),
-                                            PopupMenuItem(
-                                                value: _menuItem.favorite,
-                                                child: Text('Favorite',
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontFamily: 'Poppins',
-                                                        color: PrimaryColor))),
-                                            PopupMenuItem(
-                                                value: _menuItem.share,
-                                                child: Text("Share",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: PrimaryColor,
-                                                        fontFamily:
-                                                            'Poppins'))),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Container(
-                                            width: 200,
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    const Icon(
-                                                        Icons.location_city),
-                                                    SizedBox(width: 10),
-                                                    Expanded(
-                                                      child: Text(
-                                                        active[index]
-                                                            .companyName
-                                                            .toString(),
-                                                        softWrap: true,
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'Poppins'),
-                                                      ),
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'Poppins'),
+                                                            softWrap: true,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     )
                                                   ],
                                                 ),
-                                                Row(
-                                                  children: [
-                                                    const Icon(Icons
-                                                        .location_on_outlined),
-                                                    SizedBox(width: 10),
-                                                    Expanded(
-                                                      child: Text(
-                                                        active[index]
-                                                            .location
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'Poppins'),
-                                                      ),
-                                                    ),
-                                                  ],
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(Icons.lock_clock),
+                                                Text(
+                                                  active[index]
+                                                      .jobDeadline
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      fontFamily: 'Poppins'),
                                                 ),
-                                                Row(
-                                                  children: [
-                                                    const Icon(
-                                                        Icons.work_outline),
-                                                    SizedBox(width: 10),
-                                                    Expanded(
-                                                      child: Text(
-                                                        active[index]
-                                                            .workType
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'Poppins'),
-                                                        softWrap: true,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )
                                               ],
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Icon(Icons.lock_clock),
-                                            Text(
-                                              active[index]
-                                                  .jobDeadline
-                                                  .toString(),
-                                              style: TextStyle(
-                                                  fontFamily: 'Poppins'),
-                                            ),
+                                            )
                                           ],
                                         )
                                       ],
-                                    )
-                                  ],
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        );
-                      });
-                } else if (snapshot.hasError) {
-                  refresh();
-                  return Center(
-                    child: SingleChildScrollView(
-                      physics: BouncingScrollPhysics(),
-                      child: EmptyFailureNoInternetView(
-                        image: 'assets/lotties/no_internet_lottie.json',
-                        title: 'Network Error',
-                        description: 'Internet not found !!',
-                      ),
-                    ),
-                  );
-                } else if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
+                            );
+                          }),
+                    );
+                  } else if (snapshot.hasError) {
+                    refresh();
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return ListView.builder(
+                        itemCount: 7,
+                        itemBuilder: (context, i) {
+                          return getShimmerLoading();
+                        });
+                  }
+
                   return ListView.builder(
                       itemCount: 7,
                       itemBuilder: (context, i) {
                         return getShimmerLoading();
                       });
-                }
-
-                return ListView.builder(
-                    itemCount: 7,
-                    itemBuilder: (context, i) {
-                      return getShimmerLoading();
-                    });
-              },
-            ),
-          ),
-        ));
+                },
+              ),
+            )));
   }
 
   Shimmer getShimmerLoading() {

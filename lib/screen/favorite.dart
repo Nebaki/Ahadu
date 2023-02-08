@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../noInternet.dart';
 
@@ -25,12 +24,14 @@ class _FavoriteState extends State<Favorite> {
       return {
         "key": key,
         'name': item['name'],
+        'id': item['id'],
         'Description': item['Description'],
         'jobTitle': item['jobTitle'],
         'logo': item['logo'],
         'location': item['location'],
         'type': item['type'],
-        'deadline': item['deadline']
+        'deadline': item['deadline'],
+        'level': item['level']
       };
     }).toList();
 
@@ -95,8 +96,12 @@ class _FavoriteState extends State<Favorite> {
                             "name": currentItem['name'],
                             "Description": currentItem['Description'],
                             "logo": currentItem['logo'],
-                            "location": currentItem['location'],
-                            "id": currentItem['id']
+                            "salary": currentItem['salary'],
+                            "type": currentItem['type'],
+                            "deadline": currentItem['deadline'],
+                            "jobTitle": currentItem['jobTitle'],
+                            'level': currentItem['level'],
+                            'id': currentItem['id'],
                           }
                         ]);
                       },

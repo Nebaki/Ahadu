@@ -36,6 +36,13 @@ class _JobDetailState extends State<JobDetail>
     super.initState();
     _scrollController = ScrollController()..addListener(_scrollListener);
     print(argumentData[0]["id"]);
+    print(argumentData[0]["type"]);
+    print(argumentData[0]["level"]);
+    print(argumentData[0]["deadline"]);
+    print(argumentData[0]["jobTitle"]);
+
+    print(
+        "---------------------------------------------------------------------------");
   }
 
   @override

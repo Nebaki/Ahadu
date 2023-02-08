@@ -54,7 +54,9 @@ dependencies:
   lottie: ^2.0.0
   loadmore_listview: ^1.0.6 
   provider: ^6.0.5
-  connectivity:  
+  flutter_offline: ^2.1.0
+  google_mobile_ads: ^1.0.1
+  get_it: ^7.2.0
   
 
   
