@@ -1,4 +1,4 @@
-class Jobs {
+class JobsModel {
   String? id;
   String? jobTitle;
   String? workType;
@@ -14,7 +14,7 @@ class Jobs {
   String? companyName;
   String? companyLogo;
 
-  Jobs(
+  JobsModel(
       {this.id,
       this.jobTitle,
       this.workType,
@@ -30,7 +30,7 @@ class Jobs {
       this.companyName,
       this.companyLogo});
 
-  Jobs.fromJson(Map<String, dynamic> json) {
+  JobsModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     jobTitle = json['Job_Title'];
     workType = json['Work_Type'];

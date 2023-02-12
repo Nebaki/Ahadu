@@ -2,11 +2,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-const kAndroidBannerUnitId = "ca-app-pub-7306154300982030~2795688723";
+//You have to config the app ID here
+const kAndroidBannerUnitId = "ca-app-pub-123/456";
+const kIosBannerUnitId = "ca-app-pub-789/012";
 
-const kTestDeviceId = "1630739AA7A907A2D01D5D2C47268D3F";
+const kTestDeviceId = "D1D80B166B9CC47B0472174E59AB6D86";
 
 class AdService {
   final MobileAds _mobileAds;
@@ -24,7 +27,7 @@ class AdService {
   BannerAd getBannerAd() {
     return BannerAd(
       adUnitId: _bannerUnitId,
-      size: AdSize.fullBanner,
+      size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (Ad ad) {
@@ -35,8 +38,6 @@ class AdService {
           debugPrint("Ad error: $error");
         },
       ),
-      // You can fire-and-forget the call to .load(),
-      // it does not need to be awaited
     )..load();
   }
 
@@ -47,6 +48,10 @@ class AdService {
 
     if (Platform.isAndroid) {
       return kAndroidBannerUnitId;
+    }
+
+    if (Platform.isIOS) {
+      return kIosBannerUnitId;
     }
 
     throw UnimplementedError(

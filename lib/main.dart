@@ -7,10 +7,16 @@ import 'package:get_it/get_it.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'constants.dart';
+import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final adService = AdService(MobileAds.instance);
+  GetIt.instance.registerSingleton<AdService>(adService);
+
+  // TODO it's best to do this kind of loading in a splash screen. If you await
+  // too long in main your users will just see a black screen for that time
+  await adService.init();
   await Hive.initFlutter();
   await Hive.openBox(FAVORITE_BOX);
   runApp(const MyApp());
@@ -20,14 +26,6 @@ void main() async {
   OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
     print("Accepted permission: $accepted");
   });
-
-
-
-  final adService = AdService(MobileAds.instance);
-  GetIt.instance.registerSingleton<AdService>(adService);
-
-  await adService.init();
-
 }
 
 class MyApp extends StatelessWidget {

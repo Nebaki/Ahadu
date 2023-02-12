@@ -1,7 +1,8 @@
-import 'package:ahadu/controller/adService.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+import '../controller/adService.dart';
 
 class BottomBannerAd extends StatefulWidget {
   const BottomBannerAd({Key? key}) : super(key: key);
@@ -11,8 +12,6 @@ class BottomBannerAd extends StatefulWidget {
 }
 
 class _BottomBannerAdState extends State<BottomBannerAd> {
-  // Banner ads automatically show new ads after a certain period of time.
-  // You do not need to do anything fancy with timers or resetting this variable.
   final banner = GetIt.instance.get<AdService>().getBannerAd();
 
   @override
@@ -24,9 +23,9 @@ class _BottomBannerAdState extends State<BottomBannerAd> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: Alignment.center,
+      margin: EdgeInsets.symmetric(horizontal: 20),
       child: AdWidget(ad: banner),
-      width: double.infinity,
+      width: banner.size.width.toDouble(),
       height: banner.size.height.toDouble(),
     );
   }

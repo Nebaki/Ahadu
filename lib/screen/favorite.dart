@@ -1,11 +1,11 @@
-import 'package:ahadu/constants.dart';
+import 'package:ahadu/utils/constants.dart';
 import 'package:ahadu/screen/jobDetail.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import '../noInternet.dart';
+import '../utils/noInternet.dart';
 
 class Favorite extends StatefulWidget {
   const Favorite({super.key});

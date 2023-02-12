@@ -3,9 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  connectivity_plus_windows
+  connectivity_plus
   loadmore_listview
-  network_info_plus_windows
   url_launcher_windows
 )
 
