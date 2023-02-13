@@ -35,14 +35,6 @@ class _JobDetailState extends State<JobDetail>
   void initState() {
     super.initState();
     _scrollController = ScrollController()..addListener(_scrollListener);
-    print(argumentData[0]["id"]);
-    print(argumentData[0]["type"]);
-    print(argumentData[0]["level"]);
-    print(argumentData[0]["deadline"]);
-    print(argumentData[0]["jobTitle"]);
-
-    print(
-        "---------------------------------------------------------------------------");
   }
 
   @override
@@ -79,8 +71,13 @@ class _JobDetailState extends State<JobDetail>
               flexibleSpace: FlexibleSpaceBar(
                 collapseMode: CollapseMode.parallax,
                 title: _isShrink
-                    ? Text(
-                        argumentData[0]["jobTitle"],
+                    ? Container(
+                        width: 250.0,
+                        child: Text(
+                          argumentData[0]["jobTitle"],
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                        ),
                       )
                     : null,
                 background: SafeArea(

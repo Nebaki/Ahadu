@@ -17,7 +17,7 @@ class _AboutState extends State<About> {
       appBar: AppBar(
         title: Text(
           'About',
-          style: TextStyle(fontFamily: 'AbrilFatface'),
+          style: TextStyle(fontFamily: 'Poppins'),
         ),
         centerTitle: true,
         backgroundColor: PrimaryColor,
@@ -53,30 +53,6 @@ class _AboutState extends State<About> {
                         fontSize: 15,
                         fontFamily: 'Poppins',
                       )),
-                  Container(
-                    margin: EdgeInsets.only(top: 20),
-                    child: InkWell(
-                      onTap: () {
-                        launchUrl(Uri(
-                          scheme: 'tel',
-                          path: '+251979322838',
-                        ));
-                      },
-                      child: Row(
-                        children: [
-                          Icon(Icons.phone),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(": +251979322838",
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'Poppins',
-                              )),
-                        ],
-                      ),
-                    ),
-                  ),
                   SizedBox(
                     height: 10,
                   ),
@@ -109,14 +85,6 @@ class _AboutState extends State<About> {
                 ],
               ),
             ),
-            Container(
-              margin: EdgeInsets.only(top: 20),
-              alignment: Alignment.bottomCenter,
-              child: Text(
-                'Privacy and legal',
-                style: TextStyle(color: Colors.blue),
-              ),
-            )
           ],
         ),
       ),
