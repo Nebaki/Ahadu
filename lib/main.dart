@@ -1,5 +1,6 @@
-
 import 'package:ahadu/controller/adService.dart';
+import 'package:ahadu/screen/Test/home.dart';
+import 'package:ahadu/screen/Test/test.dart';
 import 'package:ahadu/screen/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

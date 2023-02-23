@@ -17,8 +17,7 @@ class HomeController extends GetxController {
 
   /// For Chcecking Internet Conection
   isInternrtConnect() async {
-    isInternetConnect.value  = await InternetConnectionChecker().hasConnection;
-     
+    isInternetConnect.value = await InternetConnectionChecker().hasConnection;
   }
 
   /// Callin Api and getting data From server
@@ -30,30 +29,18 @@ class HomeController extends GetxController {
     if (response.statusCode == 200) {
       response.data.forEach(
         (element) {
+          print("refreshed-----------------------------------");
           jobs.add(JobsModel.fromJson(element));
+          
         },
       );
       isLoading.value = false;
     }
   }
 
-  /// Scroll Listview To Down
-  scrollListViewDownward() {
-    itemController.scrollTo(
-        index: jobs.length - 4,
-        duration: const Duration(seconds: 2),
-        curve: Curves.fastOutSlowIn);
-    isListViewScrollToTheDown.value = true;
-  }
+  
 
-  /// Scroll Listview To Up
-  scrollListViewUpward() {
-    itemController.scrollTo(
-        index: 0,
-        duration: const Duration(seconds: 2),
-        curve: Curves.fastOutSlowIn);
-    isListViewScrollToTheDown.value = false;
-  }
+  
 
   @override
   void onInit() {
