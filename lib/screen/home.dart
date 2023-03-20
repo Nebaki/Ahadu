@@ -208,7 +208,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
           itemCount: homeController.jobs.length,
           itemBuilder: (context, index) {
               homeController.jobs.length < index
-                  ? SetState(){} isLast = false
+                  ? isLast = false
                   : isLast = true;
             if (index > 0 && index % 5 == 0) {
               return Column(
@@ -488,11 +488,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
                       ),
                     ),
                   ),
-                  isLast
-                      ? Container(
-                          child: Text('no item'),
-                        )
-                      : Container()
+                //  0925107115
                 ],
               );
             } else {

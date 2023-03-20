@@ -1,7 +1,6 @@
 import 'package:flutter/animation.dart';
 import 'package:get/get.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../model/jobs.dart';
 import '../service/dioService.dart';
@@ -13,7 +12,6 @@ class HomeController extends GetxController {
   RxBool isInternetConnect = true.obs;
 
   var url = "https://ahaduvacancy.com/jobs-list.json";
-  var itemController = ItemScrollController();
 
   /// For Chcecking Internet Conection
   isInternrtConnect() async {
